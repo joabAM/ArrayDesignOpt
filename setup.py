@@ -7,11 +7,11 @@ setup(
     version='0.1',
     description='My first Python library',
     author='Joab Apaza',
-    # install_requires=[
-    #     'scipy',
-    #     'shapely',
-    #     'numpy==1.19.5',
-    #     'matplotlib==3.6.0',
-    #     'IPython',
-    #     ],
+    install_requires=[
+        'scipy',
+        'shapely',
+        'numpy==1.19.5',
+        'matplotlib==3.6.0',
+        'IPython',
+        ],
 )

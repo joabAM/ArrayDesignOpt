@@ -40,7 +40,8 @@ import matplotlib.cbook
 from IPython.display import display, clear_output
 
 from time import sleep
-
+from os import getcwd
+from os import path
 warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
 from matplotlib.patches import Ellipse
 
@@ -87,11 +88,11 @@ class AntennaArray(object):
             if type=="hex":
                 self.antCoordinates = hexArray(**kwargs)
             elif type=="circle":
-                self.antCoordinates = circleArray(nelements=N, **kwargs)
+                self.antCoordinates = circleArray(**kwargs)
             elif type=="circular":
                 self.antCoordinates = circularArray(**kwargs)
             elif type=="squared":
-                self.antCoordinates = squaredArray(nelements=N, **kwargs)
+                self.antCoordinates = squaredArray(**kwargs)
             elif type=="rect":
                 self.antCoordinates = rectArray(**kwargs)
             elif type=="rand":
@@ -109,16 +110,25 @@ class AntennaArray(object):
         pass
 
          
-    def saveLocs2File(self,filename="txt/antLocation.txt"):
-        if len(self.Xdata) != len(self.Ydata):
+    def saveLocs2File(self,Xdata=[], Ydata=[], filename=""):
+        if len(Xdata)==0 and len(Ydata)==0:
+            XPOS = self.Xdata
+            YPOS = self.Ydata
+        else:
+            XPOS = Xdata
+            YPOS = Ydata
+        if len(XPOS) != len(YPOS):
             print("mismatch data length")
             return
-        N = len(self.Xdata)
+        N = len(XPOS)
         IDX = linspace(1,N,num=N,endpoint=True)
         LOCS = zeros( (3, N) )
         LOCS[0] = IDX
-        LOCS[1] = self.Xdata
-        LOCS[2] = self.Ydata
+        LOCS[1] = XPOS
+        LOCS[2] = YPOS
+        if filename=="":
+            aux = getcwd()
+            filename = path.join(aux,"arrayDesignOpt/txt/antLocation.txt")
         savetxt(filename, LOCS.T, fmt='%3.5e')
 
     def rotateCoordinates(self, X, Y, TH=-6.0, SAVE=None, header=""):
@@ -299,6 +309,9 @@ class AntennaArray(object):
         return firstNulls[iFN]
 
     def getSLL_HPBW_FNBW(self,IN_PATTERN, RADMIN, HYF=True,NAME="", NORM=True, DEGREES=False, XMIN=None, XMAX=None, YMIN=-60, YMAX=0.0, SHOW=True, DECIMALS=2):
+        
+        print("\n------------------------------------------------------------------------------------\n")
+
         PATTERN = IN_PATTERN.copy()
         NX, NY = PATTERN.shape
         OFFSET = 0
@@ -318,6 +331,7 @@ class AntennaArray(object):
 
         figpC, axs = plt.subplots(2)
         figpC.suptitle(NAME+" Pattern")
+        figpC.canvas.manager.set_window_title('Pattern Cuts')
         figpC.set_size_inches(10,6)
         axs[0].grid()
         axs[1].grid()
@@ -534,7 +548,7 @@ class AntennaArray(object):
             print("HPBW X/Y: ",round(HPBWX/HPBWY,2))
             print("FNBW X/Y: ",round(FNBWX/FNBWY, 2))
             print("")
-
+        plt.show()
         return G_SLL, SLLXDB, SLLYDB, FNBWX, FNBWY, _x, _y
 
 
@@ -603,6 +617,7 @@ class AntennaArray(object):
         NX, NY = PATTERN.shape
         OFFSET = 0
         LVL = -0.0 #level offset, to find....
+        print("\n------------------------------------------------------------------------------------\n")
         if not NORM: #get directivity
             MAX_REF_LEVEL = nanmax(PATTERN)
             OFFSET = 10*log10(MAX_REF_LEVEL)
@@ -623,6 +638,8 @@ class AntennaArray(object):
         figpRC, axrc = plt.subplots(1)
         figpRC.suptitle("" + NAME+" Pattern")
         figpRC.set_size_inches(10,3)
+        figpRC.canvas.manager.set_window_title('Pattern Radial Cuts')
+
         axrc.grid()
         axrc.minorticks_on()
 
@@ -814,6 +831,7 @@ class AntennaArray(object):
         if SHOW:
             print("First Null Beam Width")
             print("FNBW R: ",FNBWR)
+        plt.show()
         return G_SLL, SLLRDB, FNBWR, _x, _y, [ANGLES,PATTERN_RCUT]
 
         ################################################################################
@@ -974,7 +992,7 @@ class AntennaArray(object):
                 circle=plt.Circle( ( round(Cx0,4),round(Cy0,4) ),RADMIN*2,  color='w', fill=False)
                 axs[0].add_patch(circle)
                 axs[0].scatter(WZENX, WZENY, marker='x', color='k')
-                title = "Correcting positions, norm gain: {}, it: {}, SLL: {}".format(GAIN/NARRAY**2,it,SLL )
+                title = "Correcting positions, norm gain: {:3.4f}, it: {}, SLL: {:2.2f}".format(GAIN/NARRAY**2,it,SLL )
                 axs[0].set_title (title)
                 #axs[0].set_aspect('equal')
 
@@ -1070,7 +1088,7 @@ class AntennaArray(object):
         maskUV = circularMask(Nx, Ny, radius=int(Nx*0.5))
         PATT[~maskUV] = NaN
         BEAZEN = PATT/nanmax(PATT)
-        fig = plt.figure(figsize=(6, 6))
+        fig = plt.figure("Optimized Pattern", figsize=(6, 6))
         #plt.axes().set_aspect('equal')
         im = plt.pcolormesh(cosx,cosy,10*log10(BEAZEN),shading='auto',cmap='jet')
         plt.title ("Best in {} iterations with gain={}, best iter ={}, SLL={}".format(NITER,GAIN/NARRAY**2, itBest, SLLBEST))

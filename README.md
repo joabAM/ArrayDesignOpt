@@ -1,6 +1,6 @@
 # ArrayDesignOpt
 Python files developed to simulate 2D random array patterns, and transform regular uniform arrays to pseudo random through side lobe minimization.<br />
-Similar to the LWA (long wavelength array) stations, the stations for the NNNNNN Peru Project were designed using the Leonid Kogan's algorithm. <br />
+Similar to the LWA (long wavelength array) stations, the stations for the IGP JARGUS Project were designed using the Leonid Kogan's algorithm. <br />
 <br />
 <br />
 This library is still in development and testing :) ...

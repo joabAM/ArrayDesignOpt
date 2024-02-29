@@ -16,6 +16,7 @@ Requierement libraries:
 - scipy
 ------------------------------------------------------- <br />
 git clone https://github.com/joabAM/arrayDesignOpt.git <br />
+or git clone -b main http://intranet.igp.gob.pe:8082/arrayDesignOpt <br />
 cd arrayDesignOpt  <br />
 python setup.py bdist_wheel <br />
 pip install /path/to../dist/arrayDesignOpt-0.1-py3-none-any.whl --force-reinstall (optional) <br />
